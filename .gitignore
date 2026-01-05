@@ -1,0 +1,24 @@
+# --- Environment variables ---
+.env
+.env.*
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+
+# --- Virtual environments ---
+venv/
+.venv/
+
+# --- Databases ---
+*.duckdb
+*.sqlite
+*.db
+
+# --- Logs ---
+*.log
+
+# --- OS / Editor ---
+.DS_Store
+.vscode/
+.idea/
