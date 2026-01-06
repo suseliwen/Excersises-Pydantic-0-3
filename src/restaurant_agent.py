@@ -1,18 +1,25 @@
+import os
 from pydantic_ai import Agent
 from pydantic_ai.exceptions import ModelHTTPError
 from models import Restaurant, RestaurantSuggestions
 from dotenv import load_dotenv
 
-
 load_dotenv()
 
+def env_flag(name: str, default: bool = False) -> bool:             #Hjälpfunktion för att aktivera/deaktivera mockdata för att spara credits
+    value = os.getenv(name, str(default)).strip().lower()
+    return value in ("1", "true", "yes", "y", "on")
+
+USE_MOCK = env_flag("USE_MOCK", default=False)    
+print("USE_MOCK resolved to:", USE_MOCK)
+              
 
 agent = Agent(
     model="google-gla:gemini-2.5-flash-lite",
     output_type = RestaurantSuggestions,
     system_prompt=(
         "You suggest restaurants near a given location. "
-        "Return exactly 1 restaurant for now."
+        "Return exactly 5 restaurants."
     ),
 )
 
@@ -33,15 +40,20 @@ def _mock_five(location: str) -> RestaurantSuggestions:
 
 
 def suggest_restaurants(location: str) -> RestaurantSuggestions:
-    try:
-        result = agent.run_sync(f"Location: {location}")
-        return result.output
+
+    if USE_MOCK:
+        return _mock_five(location)
     
-    except ModelHTTPError as e:
-        if "429" in str(e) or "RESOURCE_EXHAUSTED" in str(e):
-            print("Hit Google quota/rate limit -> using mock fallback.")
-            return _mock_five(location)
-        raise
+    else:
+        try:
+            result = agent.run_sync(f"Location: {location}")
+            return result.output
+        
+        except ModelHTTPError as e:
+            if "429" in str(e) or "RESOURCE_EXHAUSTED" in str(e):
+                print("Hit Google quota/rate limit -> using mock fallback.")
+                return _mock_five(location)
+            raise
 
     
  
