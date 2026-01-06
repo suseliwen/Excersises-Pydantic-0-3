@@ -1,5 +1,5 @@
-from models import Restaurant
-from utils import insert_restaurant, select_duckdb
+from src.models import Restaurant
+from src.utils import insert_restaurant, select_duckdb
 
 r = Restaurant(
     name="Test Bistro",

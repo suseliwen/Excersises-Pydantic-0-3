@@ -1,4 +1,4 @@
-from utils import execute_duckdb
+from src.utils import execute_duckdb
 
 execute_duckdb("""
     CREATE TABLE IF NOT EXISTS restaurants (

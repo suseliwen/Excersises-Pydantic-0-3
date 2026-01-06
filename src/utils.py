@@ -2,7 +2,7 @@ from pathlib import Path
 import duckdb
 import uuid
 from datetime import datetime, timezone
-from models import Restaurant
+from src.models import Restaurant
 
 
 DATA_PATH = Path(__file__).parent / "data"
@@ -62,3 +62,8 @@ def insert_restaurant(
     )
 
     execute_duckdb(sql, parameters)
+
+    def select_duckdb(sql_code: str, parameters = None) -> list[dict]:
+        """ Kör SELECT och returnerar en lista[dict]."""
+        df = select_duckdb(sql_code, parameters)
+        return df.to_dict(orient = "records")

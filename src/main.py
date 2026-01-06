@@ -1,6 +1,6 @@
 import os
 import json
-from restaurant_agent import suggest_restaurants
+from src.restaurant_agent import suggest_restaurants
 from dotenv import load_dotenv
 
 
