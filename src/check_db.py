@@ -1,5 +1,20 @@
-from utils import select_duckdb
-import pandas as pd
+from models import Restaurant
+from utils import insert_restaurant, select_duckdb
 
-df = select_duckdb("DESCRIBE restaurants;")
-print(df)
+r = Restaurant(
+    name="Test Bistro",
+    cuisine="French",
+    price_level="$$",
+    rating=4.3,
+    description="Inserted from test script",
+    opening_hours="11-22",
+    location="Göteborg",
+)
+
+insert_restaurant(
+        input_location="Göteborg",
+        input_cuisine="French",
+        restaurant=r,
+)
+
+print(select_duckdb("SELECT * FROM restaurants"))

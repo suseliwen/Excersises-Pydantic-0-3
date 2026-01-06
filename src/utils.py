@@ -1,5 +1,8 @@
 from pathlib import Path
 import duckdb
+import uuid
+from datetime import datetime, timezone
+from models import Restaurant
 
 
 DATA_PATH = Path(__file__).parent / "data"
@@ -19,3 +22,43 @@ def select_duckdb(sql_code: str, parameters = None):
     with duckdb.connect(DB_PATH) as conn:
         cursor = conn.execute(sql_code, parameters)
         return cursor.df()
+    
+
+def insert_restaurant(
+        *,
+        input_location: str,
+        input_cuisine: str,
+        restaurant: Restaurant,
+) -> None:
+    sql = """
+
+        INSERT INTO restaurants (
+            id,
+            created,
+            input_location,
+            input_cuisine,
+            name,
+            cuisine,
+            price_level,
+            rating,
+            description,
+            opening_hours,
+            location
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """
+    parameters = (
+        str(uuid.uuid4()),
+        datetime.now(timezone.utc),
+        input_location,
+        input_cuisine,
+        restaurant.name,
+        restaurant.cuisine,
+        restaurant.price_level,
+        restaurant.rating,
+        restaurant.description,
+        restaurant.opening_hours,
+        restaurant.location,
+    )
+
+    execute_duckdb(sql, parameters)
