@@ -16,12 +16,18 @@ def execute_duckdb(sql_code: str, parameters = None) -> None:
         conn.execute(sql_code, parameters)
 
 
-def select_duckdb(sql_code: str, parameters = None):
+def select_duckdb_df(sql_code: str, parameters = None):
     """Kör SELECT och returnerar en Data Frame"""
     DATA_PATH.mkdir(exist_ok= True)
     with duckdb.connect(DB_PATH) as conn:
         cursor = conn.execute(sql_code, parameters)
         return cursor.df()
+
+def select_duckdb(sql_code: str, parameters=None) -> list[dict]:
+    """Kör SELECT och returnerar list[dict]"""
+    df = select_duckdb_df(sql_code, parameters)
+    return df.to_dict(orient="records")
+
     
 
 def insert_restaurant(

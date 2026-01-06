@@ -1,12 +1,12 @@
 import os
 from pydantic_ai import Agent
 from pydantic_ai.exceptions import ModelHTTPError
-from models import Restaurant, RestaurantSuggestions
+from src.models import Restaurant, RestaurantSuggestions
 from dotenv import load_dotenv
 
 load_dotenv()
 
-def env_flag(name: str, default: bool = False) -> bool:             #Hjälpfunktion för att aktivera/deaktivera mockdata för att spara credits
+def env_flag(name: str, default: bool = False) -> bool:             #Hjälpfunktion för att aktivera/deaktivera mockdata för att spara credits!
     value = os.getenv(name, str(default)).strip().lower()
     return value in ("1", "true", "yes", "y", "on")
 
@@ -14,12 +14,20 @@ USE_MOCK = env_flag("USE_MOCK", default=False)
 print("USE_MOCK resolved to:", USE_MOCK)
               
 
-agent = Agent(
+suggestions_agent = Agent(
     model="google-gla:gemini-2.5-flash-lite",
     output_type = RestaurantSuggestions,
     system_prompt=(
         "You suggest restaurants near a given location. "
         "Return exactly 5 restaurants."
+    ),
+)
+
+single_restaurant_agent = Agent(
+    model = "google-gla:gemini-2.5-flash-lite",
+    output_type= Restaurant,
+    system_prompt=(
+        "You generate a single restaurant near a given location and cuisine."
     ),
 )
 
@@ -46,7 +54,7 @@ def suggest_restaurants(location: str) -> RestaurantSuggestions:
     
     else:
         try:
-            result = agent.run_sync(f"Location: {location}")
+            result = suggestions_agent.run_sync(f"Location: {location}")
             return result.output
         
         except ModelHTTPError as e:
@@ -54,6 +62,16 @@ def suggest_restaurants(location: str) -> RestaurantSuggestions:
                 print("Hit Google quota/rate limit -> using mock fallback.")
                 return _mock_five(location)
             raise
+
+async def generate_restaurant(location: str, cuisine: str) -> Restaurant:
+    prompt = (
+        f"Suggest ONE restaurant near {location} that serves {cuisine} food. "
+        "Return a realistic restaurant with these fields: "
+        "name, cuisine, price_level, rating, description, opening_hours, location."
+    )
+    result = await single_restaurant_agent.run(prompt)
+    return result.output
+   
 
     
  
