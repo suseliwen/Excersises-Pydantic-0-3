@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from src.utils import execute_duckdb, select_duckdb
+from src.models import RestaurantCreateRequest
 
 
 app = FastAPI()
@@ -29,3 +30,10 @@ async def lifespan(app: FastAPI):
 @app.get("/restaurants")
 def get_restaurants():
     return select_duckdb("SELECT * FROM restaurants ORDER BY created DESC;")
+
+@app.post("/restaurants")
+async def create_restaurant(body: RestaurantCreateRequest):
+    return {
+        "received_location": body.location,
+        "received_cuisine": body.cuisine,
+    }

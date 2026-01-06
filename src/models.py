@@ -2,7 +2,6 @@ from pydantic import BaseModel, Field
 from typing import Annotated
 
 
-
 class Restaurant(BaseModel):
     name: str = Field(..., description="Restaurant name")
     cuisine: str = Field(..., description="Type of food (cuisine)")
@@ -19,6 +18,9 @@ class RestaurantSuggestions(BaseModel):
     restaurants: Annotated[list[Restaurant], Field(min_length=5, max_length=5)]
 
 
+class RestaurantCreateRequest(BaseModel):
+    location: str = Field(..., description= "Where ti search")
+    cuisine: str = Field(..., description= "Type of food, e.g. Italian, French, Chineese")
 
 
 if __name__ == "__main__":
